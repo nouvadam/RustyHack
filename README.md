@@ -7,7 +7,7 @@ If you have [Rust](https://www.rust-lang.org/learn/get-started) installed, downl
 example:  
 `cargo run --release rom/Bichromia.hex`
 
-## example ROMs
+## Example ROMs:
 - [Bichromia](https://github.com/Acedio/nand2tetris/tree/master/09/Bichromia)
 - [DrunkenSniper](https://github.com/leimao/Drunken_Sniper)
 - [GASscroller](https://github.com/gav-/Nand2Tetris-Games_and_Demos)
