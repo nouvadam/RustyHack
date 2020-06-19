@@ -37,10 +37,10 @@ fn main() -> Result<(), Error> {
 	let file;
 	
     if args.len() == 2 {
-		file = fs::read_to_string("rom\\".to_owned()+&args[1])
+		file = fs::read_to_string("rom/".to_owned()+&args[1])
         .expect("Something went wrong with reading the file");
 	} else {
-		file = fs::read_to_string("rom\\Pong.hex")
+		file = fs::read_to_string("rom/Pong.hex")
         .expect("Something went wrong with reading the file");
 		println!("Usage: hack filename \nExample: hack Pong.hex");
 	}
