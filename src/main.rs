@@ -324,124 +324,127 @@ impl Hack {
 
 /////////////////////////////////////////// tests
 
-#[warn(dead_code)]
-#[test]
-fn decoder_output_construct(zx: bool, nx: bool, zy: bool, ny: bool, f: bool, no: bool) -> DecoderOutput {
-	DecoderOutput {
-			negate_output,
-			function,
-			negate_y,
-			zero_y,
-			negate_x,
-			zero_x,
-			load_a: false,
-			load_d: false,
-			a_or_ram: false,
-			alu_or_rom: false,
-			ram_storage: false
-		}
-}
-
-#[test]
-fn alu_test() {
+#[cfg(test)]
+mod tests {
+	use super::*;
 	
-	assert_eq!(
-	Hack::alu(123, 456, &decoder_output_construct(false, false, false, false, false, false) ), 
-	123&456);
-	assert_eq!(
-	Hack::alu(123, 456, &decoder_output_construct(true, false, true, false, true, false) ), 
-	0);
-	assert_eq!(
-	Hack::alu(123, 456, &decoder_output_construct(true, true, true, true, true, true) ), 
-	1);
-	assert_eq!(
-	Hack::alu(123, 456, &decoder_output_construct(true, true, true, false, true, false) ), 
-	-1);
-	assert_eq!(
-	Hack::alu(123, 456, &decoder_output_construct(false, false, true, true, false, false) ), 
-	123);
-	assert_eq!(
-	Hack::alu(123, 456, &decoder_output_construct(true, true, false, false, false, false) ), 
-	456);
-	assert_eq!(
-	Hack::alu(123, 456, &decoder_output_construct(false, false, true, true, false, true) ), 
-	!123);
-	assert_eq!(
-	Hack::alu(123, 456, &decoder_output_construct(true, true, false, false, false, true) ), 
-	!456);
-	assert_eq!(
-	Hack::alu(123, 456, &decoder_output_construct(false, false, true, true, true, true) ), 
-	-123);
-	assert_eq!(
-	Hack::alu(123, 456, &decoder_output_construct(false, true, true, true, true, true) ), 
-	123+1);
-}
+	fn decoder_output_construct(zero_x: bool, negate_x: bool, zero_y: bool, negate_y: bool, function: bool, negate_output: bool) -> DecoderOutput {
+		DecoderOutput {
+				negate_output,
+				function,
+				negate_y,
+				zero_y,
+				negate_x,
+				zero_x,
+				load_a: false,
+				load_d: false,
+				a_or_ram: false,
+				alu_or_rom: false,
+				ram_storage: false
+			}
+	}
 
-#[test]
-fn decoder_test() {
-	
-	assert_eq!(
-		Hack::decoder(132),
-		DecoderOutput {
-			negate_output: false,
-			function:  true,
-			negate_y: false,
-			zero_y: false,
-			negate_x: false,
-			zero_x: false,
-			load_a: true,
-			load_d: false,
-			a_or_ram: true,
-			alu_or_rom: false,
-			ram_storage: false
-		}
-	);
-	assert_eq!(
-		Hack::decoder(-5497),
-		DecoderOutput {
-			negate_output: false,
-			function:  true,
-			negate_y: false,
-			zero_y: true,
-			negate_x: false,
-			zero_x: true,
-			load_a: false,
-			load_d: false,
-			a_or_ram: true,
-			alu_or_rom: true,
-			ram_storage: false
-		}
-	);
-	assert_eq!(
-		Hack::decoder(23030),
-		DecoderOutput {
-			negate_output: true,
-			function:  true,
-			negate_y: true,
-			zero_y: false,
-			negate_x: false,
-			zero_x: true,
-			load_a: true,
-			load_d: false,
-			a_or_ram: true,
-			alu_or_rom: false,
-			ram_storage: false
-		}
-	);
-	assert_eq!(
-		Hack::decoder(0),
-		DecoderOutput {
-			negate_output: false,
-			function:  false,
-			negate_y: false,
-			zero_y: false,
-			negate_x: false,
-			zero_x: false,
-			load_a: true,
-			load_d: false,
-			a_or_ram: true,
-			alu_or_rom: false,
-			ram_storage: false
-		}
-	);
+	#[test]
+	fn alu_test() {
+		
+		assert_eq!(
+		Hack::alu(123, 456, &decoder_output_construct(false, false, false, false, false, false) ), 
+		123&456);
+		assert_eq!(
+		Hack::alu(123, 456, &decoder_output_construct(true, false, true, false, true, false) ), 
+		0);
+		assert_eq!(
+		Hack::alu(123, 456, &decoder_output_construct(true, true, true, true, true, true) ), 
+		1);
+		assert_eq!(
+		Hack::alu(123, 456, &decoder_output_construct(true, true, true, false, true, false) ), 
+		-1);
+		assert_eq!(
+		Hack::alu(123, 456, &decoder_output_construct(false, false, true, true, false, false) ), 
+		123);
+		assert_eq!(
+		Hack::alu(123, 456, &decoder_output_construct(true, true, false, false, false, false) ), 
+		456);
+		assert_eq!(
+		Hack::alu(123, 456, &decoder_output_construct(false, false, true, true, false, true) ), 
+		!123);
+		assert_eq!(
+		Hack::alu(123, 456, &decoder_output_construct(true, true, false, false, false, true) ), 
+		!456);
+		assert_eq!(
+		Hack::alu(123, 456, &decoder_output_construct(false, false, true, true, true, true) ), 
+		-123);
+		assert_eq!(
+		Hack::alu(123, 456, &decoder_output_construct(false, true, true, true, true, true) ), 
+		123+1);
+	}
+
+	#[test]
+	fn decoder_test() {
+		
+		assert_eq!(
+			Hack::decoder(132),
+			DecoderOutput {
+				negate_output: false,
+				function:  true,
+				negate_y: false,
+				zero_y: false,
+				negate_x: false,
+				zero_x: false,
+				load_a: true,
+				load_d: false,
+				a_or_ram: true,
+				alu_or_rom: false,
+				ram_storage: false
+			}
+		);
+		assert_eq!(
+			Hack::decoder(-5497),
+			DecoderOutput {
+				negate_output: false,
+				function:  true,
+				negate_y: false,
+				zero_y: true,
+				negate_x: false,
+				zero_x: true,
+				load_a: false,
+				load_d: false,
+				a_or_ram: true,
+				alu_or_rom: true,
+				ram_storage: false
+			}
+		);
+		assert_eq!(
+			Hack::decoder(23030),
+			DecoderOutput {
+				negate_output: true,
+				function:  true,
+				negate_y: true,
+				zero_y: false,
+				negate_x: false,
+				zero_x: true,
+				load_a: true,
+				load_d: false,
+				a_or_ram: true,
+				alu_or_rom: false,
+				ram_storage: false
+			}
+		);
+		assert_eq!(
+			Hack::decoder(0),
+			DecoderOutput {
+				negate_output: false,
+				function:  false,
+				negate_y: false,
+				zero_y: false,
+				negate_x: false,
+				zero_x: false,
+				load_a: true,
+				load_d: false,
+				a_or_ram: true,
+				alu_or_rom: false,
+				ram_storage: false
+			}
+		);
+	}
 }
