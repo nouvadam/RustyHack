@@ -1,167 +1,10 @@
-use pixels::{wgpu::Surface, Error, Pixels, SurfaceTexture};
-use winit::dpi::LogicalSize;
-use winit::event::{Event, VirtualKeyCode, WindowEvent};
-use winit::event_loop::{ControlFlow, EventLoop};
-use winit::window::WindowBuilder;
-use winit_input_helper::WinitInputHelper;
-
-use std::env;
-use std::fs;
-
-const WIDTH: u32 = 512;
-const HEIGHT: u32 = 256;
-
-fn main() -> Result<(), Error> {
-    let event_loop = EventLoop::new();
-    let mut input = WinitInputHelper::new();
-    let window = {
-        let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
-        WindowBuilder::new()
-            .with_title("Hack: a 16-bit computer")
-            .with_inner_size(size)
-            .with_min_inner_size(size)
-            .build(&event_loop)
-            .unwrap()
-    };
-    let mut hidpi_factor = window.scale_factor();
-
-    let mut pixels = {
-        let surface = Surface::create(&window);
-        let surface_texture = SurfaceTexture::new(WIDTH, HEIGHT, surface);
-        Pixels::new(WIDTH, HEIGHT, surface_texture)?
-    };
-
-    let args: Vec<String> = env::args().collect();
-
-    let file;
-
-    if args.len() == 2 {
-        file = fs::read_to_string(&args[1]).expect("Something went wrong with reading the file");
-    } else {
-        file =
-            fs::read_to_string("rom/Pong.hex").expect("Something went wrong with reading the file");
-        println!("Usage: hack filename \nExample: hack rom/Bichromia.hex");
-    }
-
-    let mut cpu = Hack::new(file);
-
-    let mut key_pressed = 0;
-    let mut key_stack = Vec::new();
-
-    event_loop.run(move |event, _, control_flow| {
-        // Draw the current frame
-        if let Event::RedrawRequested(_) = event {
-            cpu.draw(pixels.get_frame());
-            pixels.render().unwrap();
-        }
-
-        // Handle keyboard event
-        if let Event::WindowEvent {
-            event:
-                WindowEvent::KeyboardInput {
-                    device_id,
-                    input,
-                    is_synthetic,
-                },
-            ..
-        } = event
-        {
-            key_pressed = special_keyboard_keys(input);
-            match input.state {
-                winit::event::ElementState::Pressed => {
-                    if !key_stack.iter().any(|&x| x == key_pressed) {
-                        key_stack.push(key_pressed);
-                    }
-                }
-                winit::event::ElementState::Released => {
-                    key_stack.retain(|x| *x != key_pressed);
-                }
-            }
-            key_pressed = match key_stack.last() {
-                Some(key) => *key,
-                None => 0,
-            };
-        }
-
-        // Put pressed key value into its memory map
-        cpu.ram[24576] = key_pressed as i16;
-
-        // Handle input events
-        if input.update(&event) {
-            // Close events
-            if input.quit() {
-                *control_flow = ControlFlow::Exit;
-                return;
-            }
-
-            // Adjust high DPI factor
-            if let Some(factor) = input.scale_factor_changed() {
-                hidpi_factor = factor;
-            }
-
-            // Resize the window
-            if let Some(size) = input.window_resized() {
-                pixels.resize(size.width, size.height);
-            }
-
-            // Update internal state and request a redraw
-            let hz = cpu.update();
-
-            window.set_title(&format!(
-                "Hack: a 16-bit computer | {0:.3} MHz | Key: {1}",
-                (hz as f32) / 1_000_000_f32,
-                key_pressed
-            ));
-
-            window.request_redraw();
-        }
-    });
-}
-
-// keyboard mapping as stated in the Hack specification
-fn special_keyboard_keys(input: winit::event::KeyboardInput) -> u32 {
-    match input.virtual_keycode {
-        Some(key) => match key {
-            VirtualKeyCode::Return => 128,
-            VirtualKeyCode::Back => 129,
-            VirtualKeyCode::Left => 130,
-            VirtualKeyCode::Up => 131,
-            VirtualKeyCode::Right => 132,
-            VirtualKeyCode::Down => 133,
-            VirtualKeyCode::Home => 134,
-            VirtualKeyCode::End => 135,
-            VirtualKeyCode::PageUp => 136,
-            VirtualKeyCode::PageDown => 137,
-            VirtualKeyCode::Insert => 138,
-            VirtualKeyCode::Delete => 139,
-            VirtualKeyCode::Escape => 140,
-            VirtualKeyCode::F1 => 141,
-            VirtualKeyCode::F2 => 142,
-            VirtualKeyCode::F3 => 143,
-            VirtualKeyCode::F4 => 144,
-            VirtualKeyCode::F5 => 145,
-            VirtualKeyCode::F6 => 146,
-            VirtualKeyCode::F7 => 147,
-            VirtualKeyCode::F8 => 148,
-            VirtualKeyCode::F9 => 149,
-            VirtualKeyCode::F10 => 150,
-            VirtualKeyCode::F11 => 151,
-            VirtualKeyCode::F12 => 152,
-            _ => input.scancode,
-        },
-        None => input.scancode,
-    }
-}
-
-/////////////////////////// model
-
 // A - address register, D - data register, PC - program counter register, harvard architecture
-struct Hack {
+pub struct Hack {
     a: i16,
     d: i16,
     pc: u16,
     rom: Box<[i16; 65536]>,
-    ram: Box<[i16; 65536]>,
+    pub ram: Box<[i16; 65536]>,
 }
 
 #[derive(PartialEq, Debug)]
@@ -180,20 +23,14 @@ struct DecoderOutput {
 }
 
 impl Hack {
-    pub fn new(file: String) -> Self {
-        let mut hack = Hack {
+    pub fn new() -> Self {
+        Hack {
             a: 0,
             d: 0,
             pc: 0,
             rom: Box::new([0; 65536]),
             ram: Box::new([0; 65536]),
-        };
-
-        file.lines()
-            .enumerate()
-            .for_each(|line| hack.rom[line.0] = u16::from_str_radix(line.1, 16).unwrap() as i16);
-
-        hack
+        }
     }
 
     // evil bit manipulation
@@ -235,6 +72,78 @@ impl Hack {
         out ^ (-(control.negate_output as i16))
     }
 
+    pub fn tick(&mut self) {
+        // get current instruction at address taken from Program Counter register
+        let current_instruction = self.rom[self.pc as usize];
+
+        // decoding current instruction
+        let decoder = Hack::decoder(current_instruction);
+
+        // first alu input is Data register
+        let x = self.d;
+
+        // choosing second alu input; Address register or RAM at Address register
+        let y = if decoder.a_or_ram {
+            self.a
+        } else {
+            self.ram[self.a as usize]
+        };
+
+        // do the math and get ALU output
+        let alu_output = Hack::alu(x, y, &decoder);
+
+        // write to RAM at Address register if requested
+        if decoder.ram_storage {
+            self.ram[self.a as usize] = alu_output;
+        }
+
+        // load Data register with ALU output if requested
+        if decoder.load_d {
+            self.d = alu_output;
+        }
+
+        // jump logic, based of alu output, jump to Address register value or increment Program Counter register
+        if ((current_instruction as u16) & 0b1000000000000111) > 0 {
+            if (((0b1000000000000001 & (current_instruction as u16)) == 0b1000000000000001)
+                && (alu_output > 0))
+                || (((0b1000000000000010 & (current_instruction as u16)) == 0b1000000000000010)
+                    && (alu_output == 0))
+                || (((0b1000000000000100 & (current_instruction as u16)) == 0b1000000000000100)
+                    && (alu_output < 0))
+            {
+                self.pc = self.a as u16;
+            } else {
+                self.pc += 1;
+            }
+        } else {
+            self.pc += 1;
+        }
+
+        // load Address register with ALU output or, if requested to load some data from ROM into Address register, load Address register with current instruction (not the next)
+        if decoder.load_a {
+            if decoder.alu_or_rom {
+                self.a = alu_output;
+            } else {
+                self.a = current_instruction;
+            }
+        }
+    }
+	
+	///Reset computer state
+	pub fn reset(&mut self) {
+		self.a = 0;
+		self.d = 0;
+		self.pc = 0;
+		self.ram.iter_mut().for_each(|m| *m = 0);
+	}
+	
+	/// Load ROM into computer. Should be backed by reset
+	pub fn load_rom(&mut self, file: String) {
+		file.lines()
+            .enumerate()
+            .for_each(|line| self.rom[line.0] = u16::from_str_radix(line.1, 16).unwrap() as i16);
+	}
+	
     // run computer for 1/60 second, then return how many ticks roughly has been done in one second
     pub fn update(&mut self) -> i32 {
         // handle frequency
@@ -245,60 +154,7 @@ impl Hack {
 
         // ticking for ~ 1/60 second
         while (Instant::now() - t0).subsec_millis() < 16 {
-            // get current instruction at address taken from Program Counter register
-            let current_instruction = self.rom[self.pc as usize];
-
-            // decoding current instruction
-            let decoder = Hack::decoder(current_instruction);
-
-            // first alu input is Data register
-            let x = self.d;
-
-            // choosing second alu input; Address register or RAM at Address register
-            let y = if decoder.a_or_ram {
-                self.a
-            } else {
-                self.ram[self.a as usize]
-            };
-
-            // do the math and get ALU output
-            let alu_output = Hack::alu(x, y, &decoder);
-
-            // write to RAM at Address register if requested
-            if decoder.ram_storage {
-                self.ram[self.a as usize] = alu_output;
-            }
-
-            // load Data register with ALU output if requested
-            if decoder.load_d {
-                self.d = alu_output;
-            }
-
-            // jump logic, based of alu output, jump to Address register value or increment Program Counter register
-            if ((current_instruction as u16) & 0b1000000000000111) > 0 {
-                if (((0b1000000000000001 & (current_instruction as u16)) == 0b1000000000000001)
-                    && (alu_output > 0))
-                    || (((0b1000000000000010 & (current_instruction as u16)) == 0b1000000000000010)
-                        && (alu_output == 0))
-                    || (((0b1000000000000100 & (current_instruction as u16)) == 0b1000000000000100)
-                        && (alu_output < 0))
-                {
-                    self.pc = self.a as u16;
-                } else {
-                    self.pc += 1;
-                }
-            } else {
-                self.pc += 1;
-            }
-
-            // load Address register with ALU output or, if requested to load some data from ROM into Address register, load Address register with current instruction (not the next)
-            if decoder.load_a {
-                if decoder.alu_or_rom {
-                    self.a = alu_output;
-                } else {
-                    self.a = current_instruction;
-                }
-            }
+            self.tick();
 
             // count ticks
             counter += 1;
@@ -309,7 +165,7 @@ impl Hack {
     }
 
     // draw screen memory map to physical screen buffer
-    fn draw(&self, frame: &mut [u8]) {
+    pub fn draw(&self, frame: &mut [u8]) {
         // hack screen is memory mapped; each bit in RAM 16384..24576 range encode color of one pixel (black/white), thus Hack screen is 512x256, because (24576-16384)*16 = 512*256
         self.ram[16384..24576]
             .iter()
@@ -324,14 +180,16 @@ impl Hack {
             .for_each(|pixel| {
                 if pixel.1 {
                     // if current pixel has "true" value, then put black color in buffer
-                    for i in 0..4 {
+                    for i in 0..3 {
                         frame[pixel.0 * 4 + i] = 0x0; //
                     }
                 } else {
-                    for i in 0..4 {
+                    for i in 0..3 {
                         frame[pixel.0 * 4 + i] = 0xFF;
                     }
                 }
+
+                frame[pixel.0 * 4 + 3] = 0xFF;
             });
     }
 }

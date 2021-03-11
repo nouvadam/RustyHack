@@ -1,0 +1,67 @@
+
+
+<html>
+    <head>
+        <meta charset="utf-8"/>
+		<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1' name='viewport' />
+		<link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <script type="module" src="index.js"></script>
+		<canvas id="hack-canvas" name="hack-canvas"></canvas>
+		<div class="canvas-with-buttons">
+			<div class="vertical-buttons">
+				<button id="up-button" class="button" value="38">↑</button>
+				<div class="mid-buttons">
+					<button id="left-button" class="button" value="37">←</button>
+					<button id="down-button" class="button" value="40">↓</button>
+					<button id="right-button" class="button" value="39">→</button>
+				</div>
+			</div>
+		
+			<div class="mid-controls">
+				<div>
+				 <select name="select_rom" class="select_rom">
+					<option disabled selected value> -- Select ROM -- </option>
+					<option value="Bichromia.hex">Bichromia</option>
+					<option value="Mortle2.hex">Mortle</option>
+					<option value="DrunkenSniper2.hex">Drunken Sniper</option>
+					<option value="Render2.hex">3D render</option>
+					<option value="Pong.hex">Pong</option>
+					<option value="GASscroller.hex">GASscroller</option>
+					<option value="Trig.hex">Trigonometry</option>
+					<option value="Screen.hex">Screen test</option>
+					<option value="Snake2.hex">Snake</option>
+					<option value="Blackjack2.hex">Blackjack</option>
+					<option value="jezzball2.hex">Jezzball</option>
+					<option value="chess2.hex">Chess</option>
+					<option value="Roguelike2.hex">Roguelike</option>
+					<option value="TheTronClassic2.hex">TheTronClassic</option>
+					<option value="Lightcycle2.hex">Lightcycle</option>
+					<option value="HelicopterGame2.hex">HelicopterGame</option>
+					<option value="DeserothTD2.hex">TowerDefence</option>
+					<option value="SuperGurpreetBrothers2.hex">SuperGurpreet</option>
+					<option value="Tictactoe2.hex">TicTacToe</option>
+					<option value="Risk2.hex">Risk</option>
+					<option value="zombies_apco2.hex">Zombies Apco</option>
+					<option value="Yahtzee2.hex">Yahtzee</option>
+					<option value="Seven.hex">Seven test</option>
+					<option value="SpeedTest.hex">Speed test</option>
+					<option value="Spacelike.hex">Cursor test</option>
+					<option value="minesweeper2.hex">Minesweeper</option>
+				</select>
+				<!-- <button id="play-pause-button" class="play-pause-buttons"></button>-->
+				<button id="reset-button" class="play-pause-buttons"></button>
+				</div>
+				<label for="speed_input">Speed:</label>
+				<input type="text" id="speed_input" name="Speed:" value="200000">
+			</div>
+			
+			<div>
+				<button id="return-button" class="button" value="13">&#9166;</button>
+				<button id="space-button" class="button" value="32">_</button>
+			</div>
+		</div>
+    </body>
+</html>
+
