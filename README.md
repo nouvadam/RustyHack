@@ -1,5 +1,6 @@
 # RustyHack
 A 16-bit computer emulator from [nand2tetris course](https://www.nand2tetris.org/). This implementation differs from the original specification by having extended rom/ram memory from 32K KB to 64K KB (you need a modified assembler to handle that additional memory range though).
+
 Check it [here](https://nouvadam.github.io/hack_cpu_emu/) in action.
   
 ## Screenshots:  
