@@ -9,7 +9,7 @@ Check it [here](https://nouvadam.github.io/hack_cpu_emu/) in action.
 ![Pong](pictures/screenshot3.png?raw=true)  
   
 ## How to build and run
-There are two frontends available: One standalone in `cli` folder, and the web version under `wasm`
+There are two frontends available: One standalone in `cli` folder, and the web version under `wasm`. Check them out for futher instructions.
 
 ## Example ROMs:
 - [Bichromia](https://github.com/Acedio/nand2tetris/tree/master/09/Bichromia)
