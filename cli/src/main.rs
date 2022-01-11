@@ -45,7 +45,8 @@ fn main() -> Result<(), Error> {
         println!("Usage: hack filename \nExample: hack rom/Bichromia.hex");
     }
 
-    let mut cpu = Hack::new(file);
+    let mut cpu = Hack::new();
+    cpu.load_rom(file);
 
     let mut key_pressed = 0;
     let mut key_stack = Vec::new();
