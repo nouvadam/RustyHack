@@ -4,9 +4,9 @@ A 16-bit computer emulator from [nand2tetris course](https://www.nand2tetris.org
 Check it [here](https://nouvadam.github.io/hack_cpu_emu/) in action.
   
 ## Screenshots:  
-![Render](pictures/screenshot.jpg?raw=true)  
-![Bichromia](pictures/screenshot2.jpg?raw=true)  
-![Pong](pictures/screenshot3.png?raw=true)  
+![Render](https://user-images.githubusercontent.com/66559370/149041488-21dbec1a-1e70-4c19-a30b-61d588d24eba.jpg)
+![Bichromia](https://user-images.githubusercontent.com/66559370/149041515-777cef59-2a1f-4985-bbaf-3a7f62341287.jpg)
+![Pong](https://user-images.githubusercontent.com/66559370/149041524-8f2b795d-f64b-4559-a6c1-50f49428059d.png)
   
 ## How to build and run
 There are two frontends available: One standalone in `cli` folder, and the web version under `wasm`. Check them out for futher instructions.
