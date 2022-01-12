@@ -2,12 +2,12 @@
 name = "cli"
 version = "0.1.0"
 authors = ["user"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-pixels = "0.2.0"
-winit = "0.24"
-winit_input_helper = "=0.9"
+pixels = "0.9.0"
+winit = "0.26"
+winit_input_helper = "=0.11"
 RustyHack = {path = "../"}

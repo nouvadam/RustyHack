@@ -18,6 +18,7 @@ Install necessary tools when needed.
 
 4. Run http server from www folder.
 
-`python -m http.server`
+`cargo install simple-http-server`
+`simple-http-server`
 
-5 Enter localhost:8000 in your web brower. 
+5 Enter localhost:8000/index.html in your web brower. 
