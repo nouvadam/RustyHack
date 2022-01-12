@@ -18,7 +18,9 @@ Install necessary tools when needed.
 
 4. Run http server from www folder.
 
+Install http server:
 `cargo install simple-http-server`
+Then run this command from the www folder: 
 `simple-http-server`
 
 5 Enter localhost:8000/index.html in your web brower. 
