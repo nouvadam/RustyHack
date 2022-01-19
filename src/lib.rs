@@ -128,22 +128,22 @@ impl Hack {
             }
         }
     }
-	
-	///Reset computer state
-	pub fn reset(&mut self) {
-		self.a = 0;
-		self.d = 0;
-		self.pc = 0;
-		self.ram.iter_mut().for_each(|m| *m = 0);
-	}
-	
-	/// Load ROM into computer. Should be backed by reset
-	pub fn load_rom(&mut self, file: String) {
-		file.lines()
+
+    ///Reset computer state
+    pub fn reset(&mut self) {
+        self.a = 0;
+        self.d = 0;
+        self.pc = 0;
+        self.ram.iter_mut().for_each(|m| *m = 0);
+    }
+
+    /// Load ROM into computer. Should be backed by reset
+    pub fn load_rom(&mut self, file: String) {
+        file.lines()
             .enumerate()
             .for_each(|line| self.rom[line.0] = u16::from_str_radix(line.1, 16).unwrap() as i16);
-	}
-	
+    }
+
     // run computer for 1/60 second, then return how many ticks roughly has been done in one second
     pub fn update(&mut self) -> i32 {
         // handle frequency

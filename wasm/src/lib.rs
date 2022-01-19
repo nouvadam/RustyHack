@@ -40,16 +40,16 @@ impl Hack {
             self.hack.tick()
         }
     }
-	
-	///Reset computer state
-	pub fn reset(&mut self) {
-		self.hack.reset();
-	}
-	
-	pub fn load_rom(&mut self, file: String) {
-		self.hack.load_rom(file);
-	}
-	
+
+    ///Reset computer state
+    pub fn reset(&mut self) {
+        self.hack.reset();
+    }
+
+    pub fn load_rom(&mut self, file: String) {
+        self.hack.load_rom(file);
+    }
+
     pub fn set_key(&mut self, input: i16) {
         //self.hack.ram[24576] = special_keyboard_keys(key_pressed);
 
@@ -98,7 +98,7 @@ fn special_keyboard_keys(input: i16) -> i16 {
         38 => 131,
         39 => 132,
         40 => 133,
-		57 => 32,
+        57 => 32,
         36 => 134,
         35 => 135,
         33 => 136,
@@ -106,7 +106,7 @@ fn special_keyboard_keys(input: i16) -> i16 {
         45 => 138,
         46 => 139,
         27 => 140,
-		112 => 141,
+        112 => 141,
         113 => 142,
         114 => 143,
         115 => 144,
@@ -116,7 +116,7 @@ fn special_keyboard_keys(input: i16) -> i16 {
         119 => 148,
         120 => 149,
         121 => 150,
-		122 => 151,
+        122 => 151,
         123 => 152,
         _ => input,
     }
