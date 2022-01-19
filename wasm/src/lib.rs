@@ -19,7 +19,7 @@ macro_rules! log {
 #[wasm_bindgen]
 pub struct Hack {
     hack: RustyHack::Hack,
-    draw_frame: Box<[u8; 524288]>,
+    draw_frame: [u8; 524288],
     key_stack: Vec<i16>,
 }
 
@@ -28,7 +28,7 @@ impl Hack {
     pub fn new() -> Hack {
         Hack {
             hack: RustyHack::Hack::new(),
-            draw_frame: Box::new([0; 524288]),
+            draw_frame: [0; 524288],
             key_stack: Vec::new(),
         }
     }
@@ -81,12 +81,12 @@ impl Hack {
     }
 
     pub fn frame(&self) -> *const u8 {
-        (*self.draw_frame).as_ptr()
+        self.draw_frame.as_ptr()
     }
 
     // draw screen memory map to physical screen buffer
     pub fn draw(&mut self) {
-        self.hack.draw(&mut *self.draw_frame);
+        self.hack.draw(&mut self.draw_frame);
     }
 }
 

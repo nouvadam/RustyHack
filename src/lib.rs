@@ -3,8 +3,8 @@ pub struct Hack {
     a: i16,
     d: i16,
     pc: u16,
-    rom: Box<[i16; 65536]>,
-    pub ram: Box<[i16; 65536]>,
+    rom: [i16; 65536],
+    pub ram: [i16; 65536],
 }
 
 #[derive(PartialEq, Debug)]
@@ -28,8 +28,8 @@ impl Hack {
             a: 0,
             d: 0,
             pc: 0,
-            rom: Box::new([0; 65536]),
-            ram: Box::new([0; 65536]),
+            rom: [0; 65536],
+            ram: [0; 65536],
         }
     }
 
